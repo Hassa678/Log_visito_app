@@ -1,0 +1,13 @@
+﻿galaxy_info:
+  author: hassan taj
+  description: Web application deployment role
+  min_ansible_version: 2.9
+  platforms:
+  - name: Amazon Linux
+    versions:
+    - 2
+  - name: Ubuntu
+    versions:
+    - 18.04
+    - 20.04
+dependencies: []

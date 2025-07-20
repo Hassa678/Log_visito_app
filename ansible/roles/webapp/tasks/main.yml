@@ -1,0 +1,74 @@
+---
+
+- name: Update package cache (RedHat)
+  yum:
+    update_cache: yes
+  when: ansible_os_family == "RedHat"
+
+- name: Install Docker and pip3 (RedHat)
+  yum:
+    name:
+      - docker
+      - python3-pip
+    state: present
+  when: ansible_os_family == "RedHat"
+
+- name: Install Docker Python library
+  pip:
+    name: docker
+    executable: pip3
+
+- name: Uninstall current urllib3 if needed
+  pip:
+    name: urllib3
+    state: absent
+
+- name: Install compatible versions of docker-compose and urllib3
+  pip:
+    name:
+      - "urllib3<2"
+      - "docker-compose<2"
+
+- name: Enable and start Docker service
+  service:
+    name: docker
+    state: started
+    enabled: yes
+
+- name: Create application directory
+  file:
+    path: /opt/app
+    state: directory
+    mode: '0755'
+
+- name: Copy application source files from src/
+  copy:
+    src: "{{ playbook_dir }}/../src/"
+    dest: /opt/app/
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Stop containers using the image
+  shell: |
+    docker ps -a --filter ancestor=app_flaskapp:latest -q | xargs -r docker stop
+  ignore_errors: yes
+
+- name: Remove containers using the image
+  shell: |
+    docker ps -a --filter ancestor=app_flaskapp:latest -q | xargs -r docker rm
+  ignore_errors: yes
+
+- name: Remove previous Docker image if it exists (force)
+  docker_image:
+    name: app_flaskapp
+    state: absent
+    force_absent: yes
+
+
+- name: Run docker-compose up with correct PATH
+  command: docker-compose up -d
+  args:
+    chdir: /opt/app
+  environment:
+    PATH: "/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/bin:/sbin:/root/.local/bin:/home/ec2-user/.local/bin"

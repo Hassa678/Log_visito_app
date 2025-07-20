@@ -55,8 +55,12 @@ resource "aws_internet_gateway" "igw" {
 }
 
 resource "aws_eip" "nat_eip" {
-  # no 'domain' argument
+  domain = "vpc"
+  tags = {
+    Name = "log-visitor-app-nat-eip"
+  }
 }
+
 
 
 resource "aws_nat_gateway" "nat" {

@@ -1,0 +1,6 @@
+---
+- name: Configure Flask app with Docker
+  hosts: webservers
+  become: true
+  roles:
+    - webapp

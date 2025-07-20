@@ -1,5 +1,3 @@
-# modules/rds/main.tf
-
 variable "db_subnets" { type = list(string) }
 variable "db_sg_id" {}
 

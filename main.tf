@@ -41,22 +41,15 @@ module "load_balancer" {
   app_sg_id       = module.security.app_sg_id
 }
 
-# ───── AUTOSCALING MODULE ─────
-data "aws_ami" "amazon_linux" {
-  most_recent = true
-  owners      = ["amazon"]
-  filter {
-    name   = "name"
-    values = ["amzn2-ami-hvm-*-x86_64-gp2"]
-  }
-}
+# ───── app MODULE ─────
 
-module "autoscaling" {
-  source            = "./modules/autoscaling"
+module "app" {
+  source            = "./modules/app"
   private_subnets   = module.network.private_subnets
-  ami_id            = data.aws_ami.amazon_linux.id
+  ami_id            = var.ami_id
   app_sg_id         = module.security.app_sg_id
   target_group_arn  = module.load_balancer.target_group_arn
+  key_name          = var.key_name
 }
 
 # ───── RDS MODULE ─────
@@ -64,4 +57,12 @@ module "rds" {
   source      = "./modules/rds"
   db_subnets  = module.network.private_subnets
   db_sg_id    = module.security.db_sg_id
+}
+
+
+module "bastion" {
+  source          = "./modules/bastion"
+  public_subnets  = module.network.public_subnets
+  bastion_sg_id   = module.security.bastion_sg_id
+  key_name        = var.key_name
 }

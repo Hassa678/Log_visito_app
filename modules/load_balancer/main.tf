@@ -1,5 +1,3 @@
-# modules/load_balancer/main.tf
-
 variable "vpc_id" {}
 variable "public_subnets" { type = list(string) }
 variable "alb_sg_id" {}
@@ -43,6 +41,10 @@ resource "aws_lb_listener" "app_listener" {
 
 output "alb_arn" {
   value = aws_lb.app_alb.arn
+}
+
+output "alb_dns_name" {
+  value = aws_lb.app_alb.dns_name
 }
 
 output "target_group_arn" {
