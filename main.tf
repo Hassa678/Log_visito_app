@@ -66,3 +66,7 @@ module "bastion" {
   bastion_sg_id   = module.security.bastion_sg_id
   key_name        = var.key_name
 }
+
+resource "aws_ecr_repository" "app_repo" {
+  name = "app-flaskapp-repo"
+}
